@@ -1,4 +1,5 @@
 Flask
+gunicorn
 ultralytics
 opencv-python-headless
 Pillow
