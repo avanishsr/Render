@@ -13,7 +13,7 @@ UPLOAD_FOLDER = 'uploads/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Load YOLOv8 model (replace 'best.pt' with the path to your weights)
-model = YOLO('best.pt')
+model = YOLO('last.pt')
 
 # Ensure the upload folder exists
 if not os.path.exists(UPLOAD_FOLDER):
