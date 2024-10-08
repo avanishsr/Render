@@ -1,9 +1,10 @@
 import os
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify
 from ultralytics import YOLO
 import cv2
 from PIL import Image
 import io
+import base64
 
 # Initialize the Flask app
 app = Flask(__name__)
@@ -19,11 +20,9 @@ model = YOLO('bestupadated.pt')
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
-
 @app.route('/')
 def index():
     return "Welcome to the YOLOv8 Number Plate Detection API!"
-
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -53,18 +52,17 @@ def upload_file():
             # Crop the image to the detected number plate
             cropped_img = img[y1:y2, x1:x2]
 
-            # Save the cropped image
-            cropped_img_path = os.path.join('static', 'result.jpg')
-            cv2.imwrite(cropped_img_path, cropped_img)
-
-            # Convert the cropped image to bytes to send as response
+            # Convert the cropped image to PIL format
             pil_image = Image.fromarray(cropped_img)
             img_io = io.BytesIO()
             pil_image.save(img_io, 'JPEG')
             img_io.seek(0)
 
-            # Return the cropped image as response
-            return send_file(img_io, mimetype='image/jpeg')
+            # Encode the image to Base64
+            base64_img = base64.b64encode(img_io.getvalue()).decode('utf-8')
+
+            # Return Base64 encoded image as JSON response
+            return jsonify({"cropped_image": base64_img})
 
     return jsonify({"error": "No number plate detected"}), 404
 
